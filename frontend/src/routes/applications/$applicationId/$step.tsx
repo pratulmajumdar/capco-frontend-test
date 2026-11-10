@@ -11,9 +11,8 @@ import {
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 
-import styles from '../../application-step.module.css'
-
 import { readCsrfToken } from '../../-return-target'
+import styles from '../../application-step.module.css'
 
 import type { Route } from './+types/$step'
 
@@ -152,7 +151,7 @@ export default function CurrentApplicationStepPage({
     }
 
     if (step === 'personal-details') {
-      answers.consentConfirmed = !!formValues.consentConfirmed
+      answers.consentConfirmed = Boolean(formValues.consentConfirmed)
     }
 
     return answers
@@ -316,7 +315,8 @@ export default function CurrentApplicationStepPage({
               </label>
               {reviewConfirmationError ? (
                 <p id="review-confirmation-error" role="alert">
-                  Please check the box to confirm your application is complete and accurate before submitting.
+                  Please check the box to confirm your application is complete
+                  and accurate before submitting.
                 </p>
               ) : null}
               <Button

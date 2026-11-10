@@ -132,14 +132,20 @@ export function SignInForm({
       const payload = (await response.json().catch(() => null)) as unknown
       const details = parseErrorMessages(payload)
       const firstError =
-        payload && typeof payload === 'object' && 'errors' in payload && Array.isArray(payload.errors)
+        payload &&
+        typeof payload === 'object' &&
+        'errors' in payload &&
+        Array.isArray(payload.errors)
           ? payload.errors[0]
           : null
 
       if (firstError && typeof firstError === 'object' && firstError !== null) {
         const maybeCode = 'code' in firstError ? firstError.code : undefined
         const maybePointer =
-          'source' in firstError && firstError.source && typeof firstError.source === 'object' && 'pointer' in firstError.source
+          'source' in firstError &&
+          firstError.source &&
+          typeof firstError.source === 'object' &&
+          'pointer' in firstError.source
             ? firstError.source.pointer
             : undefined
 

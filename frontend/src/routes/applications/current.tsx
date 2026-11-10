@@ -2,11 +2,12 @@ import { Stack } from '@kyc/ui'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 
+import { readCsrfToken } from '../-return-target'
+
 import {
   ApplicantJourneyPresentation,
   type ApplicantJourneyPresentationFixture,
 } from './-applicant-journey-presentation'
-import { readCsrfToken } from '../-return-target'
 
 interface JourneyApiResponse {
   data?: {
@@ -18,14 +19,20 @@ interface JourneyApiResponse {
   }
 }
 
-function toFixture(payload: JourneyApiResponse | null): ApplicantJourneyPresentationFixture {
+function toFixture(
+  payload: JourneyApiResponse | null,
+): ApplicantJourneyPresentationFixture {
   const progress = payload?.data?.attributes?.progress ?? [
     { step: 'personal-details', state: 'current' },
     { step: 'identity-and-address', state: 'remaining' },
   ]
 
   const mappedProgress = progress
-    .filter((step) => step.step === 'personal-details' || step.step === 'identity-and-address')
+    .filter(
+      (step) =>
+        step.step === 'personal-details' ||
+        step.step === 'identity-and-address',
+    )
     .map((step) => ({
       step: step.step as 'personal-details' | 'identity-and-address',
       state:
@@ -33,14 +40,15 @@ function toFixture(payload: JourneyApiResponse | null): ApplicantJourneyPresenta
           ? 'complete'
           : step.state === 'current'
             ? 'current'
-            : 'remaining' as ApplicantJourneyPresentationFixture['progress'][number]['state'],
+            : ('remaining' as ApplicantJourneyPresentationFixture['progress'][number]['state']),
     }))
 
   const currentStep = payload?.data?.attributes?.currentStep
-  const entryState =
-    mappedProgress.some((item) => item.state === 'complete' || item.state === 'current')
-      ? 'resume'
-      : 'start'
+  const entryState = mappedProgress.some(
+    (item) => item.state === 'complete' || item.state === 'current',
+  )
+    ? 'resume'
+    : 'start'
 
   return {
     entryState,
@@ -48,8 +56,18 @@ function toFixture(payload: JourneyApiResponse | null): ApplicantJourneyPresenta
       mappedProgress.length > 0
         ? mappedProgress
         : [
-            { step: 'personal-details', state: currentStep === 'personal-details' ? 'current' : 'remaining' },
-            { step: 'identity-and-address', state: currentStep === 'identity-and-address' ? 'current' : 'remaining' },
+            {
+              step: 'personal-details',
+              state:
+                currentStep === 'personal-details' ? 'current' : 'remaining',
+            },
+            {
+              step: 'identity-and-address',
+              state:
+                currentStep === 'identity-and-address'
+                  ? 'current'
+                  : 'remaining',
+            },
           ],
   }
 }
@@ -57,13 +75,15 @@ function toFixture(payload: JourneyApiResponse | null): ApplicantJourneyPresenta
 export default function CurrentApplicationJourneyPage() {
   const navigate = useNavigate()
   const [applicationId, setApplicationId] = useState<string | null>(null)
-  const [fixture, setFixture] = useState<ApplicantJourneyPresentationFixture>(() => ({
-    entryState: 'start',
-    progress: [
-      { step: 'personal-details', state: 'current' },
-      { step: 'identity-and-address', state: 'remaining' },
-    ],
-  }))
+  const [fixture, setFixture] = useState<ApplicantJourneyPresentationFixture>(
+    () => ({
+      entryState: 'start',
+      progress: [
+        { step: 'personal-details', state: 'current' },
+        { step: 'identity-and-address', state: 'remaining' },
+      ],
+    }),
+  )
 
   useEffect(() => {
     let ignore = false
@@ -90,7 +110,9 @@ export default function CurrentApplicationJourneyPage() {
         }
 
         const payload = response.ok
-          ? ((await response.json().catch(() => null)) as JourneyApiResponse | null)
+          ? ((await response
+              .json()
+              .catch(() => null)) as JourneyApiResponse | null)
           : null
 
         if (!ignore) {
@@ -119,7 +141,9 @@ export default function CurrentApplicationJourneyPage() {
   const handlePrimaryAction = async () => {
     try {
       if (applicationId) {
-        const currentStep = fixture.progress.find((step) => step.state === 'current')?.step ?? 'personal-details'
+        const currentStep =
+          fixture.progress.find((step) => step.state === 'current')?.step ??
+          'personal-details'
         void navigate(`/applications/${applicationId}/${currentStep}`)
         return
       }
@@ -142,9 +166,12 @@ export default function CurrentApplicationJourneyPage() {
         throw new Error('Unable to start application.')
       }
 
-      const payload = (await response.json().catch(() => null)) as JourneyApiResponse | null
+      const payload = (await response
+        .json()
+        .catch(() => null)) as JourneyApiResponse | null
       const nextApplicationId = payload?.data?.id
-      const currentStep = payload?.data?.attributes?.currentStep ?? 'personal-details'
+      const currentStep =
+        payload?.data?.attributes?.currentStep ?? 'personal-details'
       if (!nextApplicationId) {
         throw new Error('Application was not created.')
       }

@@ -79,11 +79,12 @@ export function CreateAccountForm({
 
   function validateClientFields(): boolean {
     const trimmedEmail = email.trim()
-    const nextEmailError = trimmedEmail.length === 0
-      ? 'Enter an email address.'
-      : !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)
-        ? 'Enter a valid email address.'
-        : undefined
+    const nextEmailError =
+      trimmedEmail.length === 0
+        ? 'Enter an email address.'
+        : !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)
+          ? 'Enter a valid email address.'
+          : undefined
 
     const nextPasswordError =
       password.length === 0
@@ -146,15 +147,23 @@ export function CreateAccountForm({
 
       const parsed = (await response.json().catch(() => null)) as unknown
       const details = parseErrorMessages(parsed)
-      const code = parsed && typeof parsed === 'object' && 'errors' in parsed && Array.isArray(parsed.errors)
-        ? parsed.errors[0]
-        : null
+      const code =
+        parsed &&
+        typeof parsed === 'object' &&
+        'errors' in parsed &&
+        Array.isArray(parsed.errors)
+          ? parsed.errors[0]
+          : null
 
       if (code && typeof code === 'object' && code !== null && 'code' in code) {
         const errorCode = code.code
-        const pointer = 'source' in code && code.source && typeof code.source === 'object' && 'pointer' in code.source
-          ? code.source.pointer
-          : undefined
+        const pointer =
+          'source' in code &&
+          code.source &&
+          typeof code.source === 'object' &&
+          'pointer' in code.source
+            ? code.source.pointer
+            : undefined
 
         if (errorCode === 'email-already-registered') {
           setError('An account already exists for this email address.')
@@ -177,7 +186,10 @@ export function CreateAccountForm({
         }
 
         if (pointer === '/data/attributes/password') {
-          setPasswordError(details[0] || 'Use at least 6 characters including an uppercase letter and special character.')
+          setPasswordError(
+            details[0] ||
+              'Use at least 6 characters including an uppercase letter and special character.',
+          )
           return
         }
       }
@@ -298,7 +310,9 @@ export function CreateAccountForm({
                     onNavigate(accountAccessHref('/sign-in', returnTo))
                     return
                   }
-                  window.location.assign(accountAccessHref('/sign-in', returnTo))
+                  window.location.assign(
+                    accountAccessHref('/sign-in', returnTo),
+                  )
                 }}
                 type="button"
               >
