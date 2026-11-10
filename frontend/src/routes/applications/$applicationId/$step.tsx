@@ -369,7 +369,6 @@ export default function CurrentApplicationStepPage({
           <Stack
             component="form"
             className={styles.stepForm}
-            noValidate
             onSubmit={(event) => {
               event.preventDefault()
               void advance()
