@@ -10,7 +10,11 @@ import {
 } from '@kyc/ui'
 import { useEffect, useRef, useState } from 'react'
 
-import { accountAccessHref, isSafeJourneyPath } from './-return-target'
+import {
+  accountAccessHref,
+  isSafeJourneyPath,
+  storeCsrfToken,
+} from './-return-target'
 import styles from './account-access.module.css'
 
 export interface SignInFormProps {
@@ -103,6 +107,11 @@ export function SignInForm({
       })
 
       if (response.ok) {
+        const csrfToken = response.headers.get('X-CSRF-TOKEN')
+        if (csrfToken) {
+          storeCsrfToken(csrfToken)
+        }
+
         const payload = (await response.json().catch(() => null)) as {
           data?: { attributes?: { href?: string } }
         } | null
